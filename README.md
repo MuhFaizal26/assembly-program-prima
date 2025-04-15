@@ -5,64 +5,52 @@
 
 # 🔢 Pengecek Angka Prima dengan x86-64 Assembly
 
-Program sederhana namun powerful ini memungkinkan kamu untuk **memasukkan angka (maksimal 20 digit)** dan memeriksa apakah angka tersebut **bilangan prima** atau bukan. Ditulis sepenuhnya menggunakan **bahasa Assembly x86-64 (sintaks NASM)** untuk sistem operasi Linux. 🧠💻
+Ini adalah program **Assembly (NASM)** sederhana yang dijalankan di Linux untuk memeriksa apakah input angka dari pengguna merupakan **bilangan prima** atau bukan.
 
-## 🧠 Cara Kerja
+## 🧠 Alur Program
 
-### ✅ Alur Langkah demi Langkah
+### 1. Menampilkan Pesan Input
 
-1. **Tampilkan Permintaan Input**  
-   Menampilkan pesan berikut:
+```asm
+mov rax, 1          ; syscall write
+mov rdi, 1          ; stdout
+mov rsi, hello      ; pesan "Masukkan angka..."
+mov rdx, helloLen
+syscall
+Menampilkan instruksi agar user memasukkan angka.
 
+mov rax, 0      ; syscall read
+mov rdi, 0      ; stdin
+mov rsi, angka  ; buffer input
+mov rdx, 20     ; baca maks 20 karakter
+syscall
+Membaca input user ke dalam buffer angka.
 
-2. **Menerima Input dari Pengguna**  
-Program menunggu kamu mengetik angka dan menekan Enter. Input tersebut disimpan dalam buffer.
+.convert_loop:
+    ...
+    sub bl, '0'         ; ubah ASCII ke angka
+    imul rax, rax, 10   ; kalikan total dengan 10
+    add rax, rbx        ; tambahkan digit baru
+Loop ini akan membaca digit demi digit, mengubah dari karakter ASCII ke integer asli.
 
-3. **Konversi dari ASCII ke Integer**  
-Input berupa teks seperti `"123\n"` akan dikonversi menjadi angka asli di register.
+mov rcx, 2
+.check_loop:
+    ...
+    div rcx
+    cmp rdx, 0
+    je .not_prime
+Loop sederhana: membagi angka input (rsi) dengan semua angka dari 2 sampai n-1.
 
-4. **Pemeriksaan Bilangan Prima**  
-Pemeriksaan dilakukan dengan cara sederhana:
-- Mulai dari angka 2
-- Bagi angka yang dimasukkan dengan angka-angka berturut-turut (2, 3, 4, ...)
-- Jika hasil bagi **tidak bersisa**, maka bukan prima
-- Jika tidak ada pembagi yang cocok sampai akhir, maka itu angka prima!
+Jika ada sisa 0 → bukan prima
 
-5. **Tampilkan Hasil**  
-- Jika bukan prima:
-  ```
-  Bukan angka prima
-  ```
-- Jika prima:
-  ```
-  Angka prima
-  ```
+Jika tidak ada → prima
 
-6. **Keluar dari Program Secara Bersih**
+Output Hasil
+.not_prime:
+    mov rsi, no   ; tampilkan "Bukan angka prima"
 
----
-
-## 🔧 Penjelasan Tiap Bagian
-
-### `.data`
-Menyimpan pesan statis:
-- `hello`: pesan untuk meminta input
-- `no`: pesan jika angka bukan prima
-- `yes`: pesan jika angka adalah prima
-
-### `.bss`
-Mendeklarasikan `angka`, sebuah buffer 20 byte untuk menampung input.
-
-### `.text`
-Bagian utama dari program.
-
-#### `_start`
-Titik masuk program, berisi:
-- Syscall untuk menampilkan pesan dan membaca input
-- Logika konversi string ke angka
-- Perulangan pengecekan angka prima
-- Menampilkan hasil
-- Keluar dari program
+.is_prime:
+    mov rsi, yes  ; tampilkan "Angka prima"
 
 ---
 
